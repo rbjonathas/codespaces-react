@@ -1,29 +1,32 @@
-import './App.css';
+import "./styles/theme.css";
+import "./styles/global.css";
+import { ProductList } from "./components/ProductList";
+import { Header } from "./components/Header";
+import { Route, Routes } from "react-router";
+import { Cart } from "./components/Cart";
+import { CartProvider } from "./context/CartContext";
+import { SessionProvider } from "./context/SessionContext";
+import { Login } from "./components/Login";
+import { ToastContainer } from "react-toastify";
+import { User } from "./components/User";
 
-function App() {
+export default function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src="Octocat.png" className="App-logo" alt="logo" />
-        <p>
-          GitHub Codespaces <span className="heart">♥️</span> React
-        </p>
-        <p className="small">
-          Edit <code>src/App.jsx</code> and save to reload.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </p>
-      </header>
-    </div>
+    <>
+      <ToastContainer />
+      <SessionProvider>
+        <CartProvider>
+          <Header />
+          <Routes>
+          <Route path="/" element={<ProductList />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/signin" element={<Login value="signin" />} />
+          <Route path="/register" element={<Login value="register" />} />
+          <Route path="/user" element={<User />} />
+          </Routes>
+        </CartProvider>
+      </SessionProvider>
+    </>
   );
 }
-
-export default App;

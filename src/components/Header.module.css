@@ -1,0 +1,89 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  height: 15rem;
+  padding: 5rem;
+  background-color: var(--primary);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.container h1 {
+  font-size: 5rem;
+  font-weight: bolder;
+  color: var(--background);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  gap: 2rem;
+}
+
+.link {
+  font-size: 2rem;
+  text-decoration: none;
+  color: var(--primary);
+  color: var(--text);
+  transition: color 0.3s;
+}
+
+.link:hover {
+  color: var(--primary-dark);
+}
+
+.containerImg img {
+  height: auto;
+  width: 100%;
+  max-width: 20rem;
+}
+
+.container p {
+  font-size: 1.5rem;
+}
+
+.cartInfo {
+  border-radius: 3rem;
+  background-color: var(--primary-light);
+  color: var(--primary-contrast-dark);
+  padding: 2rem;
+  font-size: 3rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.cartIcon {
+  position: relative;
+  display: inline-block;
+}
+
+.cartCount {
+  position: absolute;
+  top: -0.8rem;
+  right: -2rem;
+  font-size: 1.5rem;
+  border-radius: 1rem;
+  background-color: var(--primary-dark);
+  color: var(--gray-100);
+  padding: 0.2rem 0.6rem;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.welcomeMessage {
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-right: 1rem;
+  text-decoration: none;
+}
+
+.welcomeMessage:hover {
+  text-decoration: underline;
+}

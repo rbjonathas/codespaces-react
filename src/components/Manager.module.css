@@ -1,0 +1,111 @@
+.managerContainer {
+  min-height: 100vh;
+  background: var(--primary-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem;
+}
+
+.managerBox {
+  background: var(--primary-light);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px #0002;
+  padding: 2.5rem 2rem;
+  max-width: 700px;
+  width: 100%;
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.managerTitle {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary-dark);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.managerActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.managerInput {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 0.7rem;
+  font-size: 1.1rem;
+  outline: none;
+  transition: border 0.2s;
+  min-width: 120px;
+}
+
+.managerInput:focus {
+  border-color: var(--primary-dark);
+}
+
+.managerButton {
+  background: var(--primary-dark);
+  color: var(--primary-light);
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.managerButton:hover {
+  background: var(--secundary-light);
+  color: var(--primary-dark);
+}
+
+.managerList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.managerItem {
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 0.7rem;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.managerItemInfo {
+  flex: 1;
+}
+
+.managerItemActions button {
+  margin-left: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .managerBox {
+    padding: 1rem 0.5rem;
+  }
+  .managerTitle {
+    font-size: 1.5rem;
+  }
+  .managerActions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .managerItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

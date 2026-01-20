@@ -11,15 +11,17 @@ export function Product({ product }) {
   const [showOptions, setShowOptions] = useState(false);
   const [added, setAdded] = useState(false);
 
-  /* 🔹 CARREGA OPÇÕES DO PRODUTO */
+  /* 🔹 CARREGA OPÇÕES (VARIANTES) */
   useEffect(() => {
     async function loadOptions() {
       const { data, error } = await supabase
         .from("product_options")
-        .select("*")
-        .eq("product_id", product.id);
+        .select("id, option_name, price")
+        .eq("product_id", product.id)
+        .order("price");
 
       if (!error) setOptions(data || []);
+      else console.error(error);
     }
 
     loadOptions();
@@ -28,7 +30,7 @@ export function Product({ product }) {
   return (
     <div className={styles.productCard}>
       <img
-        src={selectedOption?.image_url || product.image_url}
+        src={product.image_url}
         alt={product.name}
         className={styles.productImage}
       />
@@ -48,19 +50,19 @@ export function Product({ product }) {
           : "Selecione uma opção"}
       </p>
 
-      {/* 🔹 OPÇÕES (TAMANHO / TIPO) */}
+      {/* 🔹 OPÇÕES */}
       {showOptions && (
         <div className={styles.optionsBox}>
-          {options.map((opt) => (
+          {options.map((option) => (
             <button
-              key={opt.id}
+              key={option.id}
               className={`${styles.optionButton} ${
-                selectedOption?.id === opt.id ? styles.active : ""
+                selectedOption?.id === option.id ? styles.active : ""
               }`}
-              onClick={() => setSelectedOption(opt)}
+              onClick={() => setSelectedOption(option)}
             >
-              <strong>{opt.label}</strong>
-              <span>R$ {Number(opt.price).toFixed(2)}</span>
+              <strong>{option.option_name}</strong>
+              <span>R$ {Number(option.price).toFixed(2)}</span>
             </button>
           ))}
         </div>
@@ -79,12 +81,7 @@ export function Product({ product }) {
           if (!selectedOption) return;
 
           addToCart({
-            option_id: selectedOption.id,
-            product_id: product.id,
-            name: product.name,
-            price: selectedOption.price,
-            image: selectedOption.image_url || product.image_url,
-            option_label: selectedOption.label,
+            id: selectedOption.id, // product_option_id
           });
 
           setAdded(true);

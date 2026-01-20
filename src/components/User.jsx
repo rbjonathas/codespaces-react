@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import styles from "./User.module.css";
 import { SessionContext } from "../context/SessionContext";
-import { Manager } from "./Manager";
+import Manager from "./Manager";
 
 export function User() {
   const { session, handleSignOut } = useContext(SessionContext);

@@ -16,13 +16,18 @@ export function CartProvider({ children }) {
   const { session } = useContext(SessionContext);
   const navigate = useNavigate();
 
-  /* LOAD PRODUCTS */
+  /* LOAD PRODUCTS (opcional, não interfere no carrinho) */
   const refetchProducts = async () => {
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase.from("products").select("*");
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("*");
+
     if (error) setError(error.message);
     else setProducts(data || []);
+
     setLoading(false);
   };
 
@@ -30,9 +35,10 @@ export function CartProvider({ children }) {
     refetchProducts();
   }, []);
 
-  /* LOAD CART */
+  /* LOAD CART — ALINHADO AO BANCO */
   const loadCartForUser = async (user_id) => {
     if (!user_id) return;
+
     const { data, error } = await supabase
       .from("cart")
       .select(`
@@ -40,13 +46,11 @@ export function CartProvider({ children }) {
         quantity,
         product_option:product_options (
           id,
-          label,
+          option_name,
           price,
-          image_url,
           product:products (
             id,
-            name,
-            image_url
+            name
           )
         )
       `)
@@ -63,34 +67,32 @@ export function CartProvider({ children }) {
         option_id: row.product_option.id,
         quantity: row.quantity,
         name: row.product_option.product.name,
-        label: row.product_option.label,
+        option_name: row.product_option.option_name,
         price: row.product_option.price,
-        image:
-          row.product_option.image_url ||
-          row.product_option.product.image_url,
       }))
     );
   };
 
   /* ADD TO CART */
   const addToCart = async (option) => {
+    const optionId = option?.option_id || option?.id;
+    if (!optionId) return;
+
     if (!session?.user?.id) {
-      if (option?.id) {
-        localStorage.setItem(
-          PENDING_OPTION_KEY,
-          JSON.stringify({ option_id: option.id })
-        );
-      }
+      localStorage.setItem(
+        PENDING_OPTION_KEY,
+        JSON.stringify({ option_id: optionId })
+      );
       navigate("/signin");
       return;
     }
-    if (!option?.id) return;
 
     const user_id = session.user.id;
+
     const { data: existing } = await supabase
       .from("cart")
       .select("id, quantity")
-      .match({ user_id, product_option_id: option.id })
+      .match({ user_id, product_option_id: optionId })
       .single();
 
     if (existing) {
@@ -100,7 +102,11 @@ export function CartProvider({ children }) {
         .eq("id", existing.id);
     } else {
       await supabase.from("cart").insert([
-        { user_id, product_option_id: option.id, quantity: 1 },
+        {
+          user_id,
+          product_option_id: optionId,
+          quantity: 1,
+        },
       ]);
     }
 
@@ -110,6 +116,7 @@ export function CartProvider({ children }) {
   /* RESTORE PENDING OPTION */
   const restorePendingOption = async () => {
     if (!session?.user?.id) return;
+
     const raw = localStorage.getItem(PENDING_OPTION_KEY);
     if (!raw) return;
 
@@ -123,27 +130,40 @@ export function CartProvider({ children }) {
   /* UPDATE QTY */
   const updateQtyCart = async (option_id, quantity) => {
     if (!session?.user?.id) return;
+
     if (quantity <= 0) {
       await supabase
         .from("cart")
         .delete()
-        .match({ user_id: session.user.id, product_option_id: option_id });
+        .match({
+          user_id: session.user.id,
+          product_option_id: option_id,
+        });
     } else {
       await supabase
         .from("cart")
         .update({ quantity })
-        .match({ user_id: session.user.id, product_option_id: option_id });
+        .match({
+          user_id: session.user.id,
+          product_option_id: option_id,
+        });
     }
+
     await loadCartForUser(session.user.id);
   };
 
   /* REMOVE ITEM */
   const removeFromCart = async (option_id) => {
     if (!session?.user?.id) return;
+
     await supabase
       .from("cart")
       .delete()
-      .match({ user_id: session.user.id, product_option_id: option_id });
+      .match({
+        user_id: session.user.id,
+        product_option_id: option_id,
+      });
+
     await loadCartForUser(session.user.id);
   };
 
@@ -153,10 +173,12 @@ export function CartProvider({ children }) {
       setCart([]);
       return;
     }
+
     await supabase
       .from("cart")
       .delete()
       .eq("user_id", session.user.id);
+
     setCart([]);
   };
 

@@ -16,7 +16,7 @@ import { SessionProvider } from "./context/SessionContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute } from "./components/admin/AdminRoute";
 
-import { Manager } from "./components/Manager";
+import Manager from "./components/Manager";
 import { ManagerVariants } from "./components/ManagerVariants";
 
 export default function App() {

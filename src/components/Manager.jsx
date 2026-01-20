@@ -1,155 +1,262 @@
-import { useState, useEffect, useContext } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Manager.module.css";
 import { supabase } from "../utils/supabase";
-import { SessionContext } from "../context/SessionContext";
 
 export function Manager() {
-  const { session } = useContext(SessionContext);
+  const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({ id: null, title: "", price: "", thumbnail: "", description: "" });
-  const [editing, setEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [options, setOptions] = useState([]);
 
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const [categoryName, setCategoryName] = useState("");
+
+  const [productForm, setProductForm] = useState({
+    name: "",
+    description: "",
+    image_url: "",
+  });
+
+  const [optionForm, setOptionForm] = useState({
+    label: "",
+    price: "",
+    image_url: "",
+  });
+
+  /* =========================
+     LOAD CATEGORIES
+  ========================= */
   useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const { data, error } = await supabase.from("product_1v").select();
-      if (error) setError(error.message);
-      else setProducts(data || []);
-      setLoading(false);
-    }
-    // only load if admin
-    if (session?.user?.user_metadata?.admin) load();
-  }, [session]);
+    fetchCategories();
+  }, []);
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  async function fetchCategories() {
+    const { data } = await supabase
+      .from("categories")
+      .select("*")
+      .order("name");
+
+    setCategories(data || []);
   }
 
-  async function handleSubmit(e) {
+  async function fetchProducts(categoryId) {
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .eq("category_id", categoryId)
+      .order("name");
+
+    setProducts(data || []);
+    setOptions([]);
+  }
+
+  async function fetchOptions(productId) {
+    const { data } = await supabase
+      .from("product_options")
+      .select("*")
+      .eq("product_id", productId)
+      .order("price");
+
+    setOptions(data || []);
+  }
+
+  /* =========================
+     CREATE CATEGORY
+  ========================= */
+  async function createCategory(e) {
     e.preventDefault();
-    if (!form.title || form.price === "") return;
-    try {
-      if (editing) {
-        const { error } = await supabase
-          .from("product_1v")
-          .update({ title: form.title, price: Number(form.price), thumbnail: form.thumbnail, description: form.description })
-          .eq("id", form.id);
-        if (error) throw error;
-        setProducts(products.map(p => p.id === form.id ? { ...p, title: form.title, price: Number(form.price), thumbnail: form.thumbnail, description: form.description } : p));
-        setEditing(false);
-      } else {
-        const { data, error } = await supabase
-          .from("product_1v")
-          .insert([{ title: form.title, price: Number(form.price), thumbnail: form.thumbnail, description: form.description }])
-          .select()
-          .single();
-        if (error) throw error;
-        setProducts([...products, data]);
-      }
-      setForm({ id: null, title: "", price: "", thumbnail: "", description: "" });
-    } catch (err) {
-      console.error(err);
-      setError(err.message || String(err));
-    }
+    if (!categoryName.trim()) return;
+
+    const { data } = await supabase
+      .from("categories")
+      .insert([{ name: categoryName }])
+      .select()
+      .single();
+
+    setCategoryName("");
+    await fetchCategories();
+
+    // 🔥 seleciona automaticamente a nova categoria
+    setSelectedCategory(data);
+    setProducts([]);
+    setOptions([]);
   }
 
-  function handleEdit(product) {
-    setForm({ id: product.id, title: product.title || "", price: product.price ?? "", thumbnail: product.thumbnail || "", description: product.description || "" });
-    setEditing(true);
+  /* =========================
+     CREATE PRODUCT
+  ========================= */
+  async function createProduct(e) {
+    e.preventDefault();
+    if (!selectedCategory || !productForm.name.trim()) return;
+
+    await supabase.from("products").insert([
+      {
+        category_id: selectedCategory.id,
+        name: productForm.name,
+        description: productForm.description,
+        image_url: productForm.image_url,
+      },
+    ]);
+
+    setProductForm({ name: "", description: "", image_url: "" });
+    fetchProducts(selectedCategory.id);
   }
 
-  async function handleRemove(id) {
-    try {
-      const { error } = await supabase.from("product_1v").delete().eq("id", id);
-      if (error) throw error;
-      setProducts(products.filter(p => p.id !== id));
-      if (editing && form.id === id) {
-        setForm({ id: null, title: "", price: "", thumbnail: "", description: "" });
-        setEditing(false);
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.message || String(err));
-    }
-  }
+  /* =========================
+     CREATE OPTION
+  ========================= */
+  async function createOption(e) {
+    e.preventDefault();
+    if (!selectedProduct || !optionForm.label || !optionForm.price) return;
 
-  if (!session) return <p>Faça login para acessar esta área.</p>;
-  if (!session.user.user_metadata.admin) return <p>Você não tem permissão para acessar esta área.</p>;
+    await supabase.from("product_options").insert([
+      {
+        product_id: selectedProduct.id,
+        label: optionForm.label,
+        price: Number(optionForm.price),
+        image_url: optionForm.image_url,
+      },
+    ]);
+
+    setOptionForm({ label: "", price: "", image_url: "" });
+    fetchOptions(selectedProduct.id);
+  }
 
   return (
-    <div className={styles.managerContainer}>
-      <div className={styles.managerBox}>
-        <h2 className={styles.managerTitle}>Gerenciar Produtos</h2>
-        {error && <div className={styles.managerError}>{error}</div>}
-        <form onSubmit={handleSubmit} className={styles.managerActions}>
+    <div className={styles.container}>
+      <h2>Administração — Black Coffee ☕</h2>
+
+      {/* =========================
+         CATEGORIES
+      ========================= */}
+      <section className={styles.section}>
+        <h3>Categorias</h3>
+
+        <form onSubmit={createCategory} className={styles.form}>
           <input
-            name="title"
-            placeholder="Nome do produto"
-            value={form.title}
-            onChange={handleChange}
-            className={styles.managerInput}
-            required
+            placeholder="Ex: Cafés Quentes"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
           />
-          <input
-            name="price"
-            type="number"
-            placeholder="Preço"
-            value={form.price}
-            onChange={handleChange}
-            className={styles.managerInput}
-            required
-            min={0}
-            step={0.01}
-          />
-          <input
-            name="thumbnail"
-            placeholder="URL da imagem (thumbnail)"
-            value={form.thumbnail}
-            onChange={handleChange}
-            className={styles.managerInput}
-          />
-          <input
-            name="description"
-            placeholder="Descrição"
-            value={form.description}
-            onChange={handleChange}
-            className={styles.managerInput}
-          />
-          <button type="submit" className={styles.managerButton}>
-            {editing ? "Atualizar" : "Adicionar"}
-          </button>
+          <button type="submit">Criar categoria</button>
         </form>
-        {loading ? (
-          <p>Carregando produtos...</p>
-        ) : (
-          <ul className={styles.managerList}>
-            {products.map(product => (
-              <li key={product.id} className={styles.managerItem}>
-                <div className={styles.managerItemInfo}>
-                  <strong>{product.title}</strong> - R$ {(Number(product.price) || 0).toFixed(2)}
-                  <div>{product.description}</div>
-                </div>
-                <div className={styles.managerItemActions}>
-                  <button
-                    className={styles.managerButton}
-                    onClick={() => handleEdit(product)}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className={styles.managerButton}
-                    onClick={() => handleRemove(product.id)}
-                  >
-                    Remover
-                  </button>
-                </div>
+
+        <div className={styles.list}>
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              className={`${styles.selectBtn} ${
+                selectedCategory?.id === c.id ? styles.active : ""
+              }`}
+              onClick={() => {
+                setSelectedCategory(c);
+                setSelectedProduct(null);
+                fetchProducts(c.id);
+              }}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* =========================
+         PRODUCTS
+      ========================= */}
+      {selectedCategory && (
+        <section className={styles.section}>
+          <h3>Produtos — {selectedCategory.name}</h3>
+
+          <form onSubmit={createProduct} className={styles.form}>
+            <input
+              placeholder="Nome do café"
+              value={productForm.name}
+              onChange={(e) =>
+                setProductForm({ ...productForm, name: e.target.value })
+              }
+            />
+            <input
+              placeholder="Descrição"
+              value={productForm.description}
+              onChange={(e) =>
+                setProductForm({
+                  ...productForm,
+                  description: e.target.value,
+                })
+              }
+            />
+            <input
+              placeholder="URL da imagem"
+              value={productForm.image_url}
+              onChange={(e) =>
+                setProductForm({ ...productForm, image_url: e.target.value })
+              }
+            />
+            <button type="submit">Criar produto</button>
+          </form>
+
+          <div className={styles.list}>
+            {products.map((p) => (
+              <button
+                key={p.id}
+                className={`${styles.selectBtn} ${
+                  selectedProduct?.id === p.id ? styles.active : ""
+                }`}
+                onClick={() => {
+                  setSelectedProduct(p);
+                  fetchOptions(p.id);
+                }}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* =========================
+         OPTIONS
+      ========================= */}
+      {selectedProduct && (
+        <section className={styles.section}>
+          <h3>Opções — {selectedProduct.name}</h3>
+
+          <form onSubmit={createOption} className={styles.form}>
+            <input
+              placeholder="Ex: Médio / 250ml"
+              value={optionForm.label}
+              onChange={(e) =>
+                setOptionForm({ ...optionForm, label: e.target.value })
+              }
+            />
+            <input
+              type="number"
+              placeholder="Preço"
+              value={optionForm.price}
+              onChange={(e) =>
+                setOptionForm({ ...optionForm, price: e.target.value })
+              }
+            />
+            <input
+              placeholder="Imagem (opcional)"
+              value={optionForm.image_url}
+              onChange={(e) =>
+                setOptionForm({ ...optionForm, image_url: e.target.value })
+              }
+            />
+            <button type="submit">Criar opção</button>
+          </form>
+
+          <ul className={styles.optionList}>
+            {options.map((o) => (
+              <li key={o.id}>
+                {o.label} — R$ {Number(o.price).toFixed(2)}
               </li>
             ))}
           </ul>
-        )}
-      </div>
+        </section>
+      )}
     </div>
   );
 }

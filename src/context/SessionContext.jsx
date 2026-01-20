@@ -1,8 +1,9 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useMemo } from "react";
 import { supabase } from "../utils/supabase";
 
 export const SessionContext = createContext({
   session: null,
+  isAdmin: false,
   sessionLoading: false,
   sessionMessage: null,
   sessionError: null,
@@ -43,6 +44,10 @@ export function SessionProvider({ children }) {
       }
     };
   }, []);
+
+  const isAdmin = useMemo(() => {
+    return Boolean(session?.user?.user_metadata?.admin);
+  }, [session]);
 
   async function handleSignUp(email, password, username) {
     setSessionLoading(true);
@@ -120,6 +125,7 @@ export function SessionProvider({ children }) {
 
   const value = {
     session,
+    isAdmin,
     sessionLoading,
     sessionMessage,
     sessionError,
@@ -128,5 +134,9 @@ export function SessionProvider({ children }) {
     handleSignOut,
   };
 
-  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={value}>
+      {children}
+    </SessionContext.Provider>
+  );
 }

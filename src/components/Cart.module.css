@@ -20,48 +20,35 @@
 .cartItem {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 5rem;
-  padding: 2rem 5rem;
-  margin: 2rem;
+  gap: 4rem;
+  padding: 2rem 4rem;
+  margin: 2rem 0;
   border-radius: 1rem;
   background-color: var(--gray-100);
   color: var(--primary-contrast-dark);
 }
 
 .cartItem img {
-  width: 20rem;
-  height: auto;
+  width: 18rem;
 }
 
-.cartItem h3 {
+/* INFO */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.info h3 {
+  font-size: 2.2rem;
+}
+
+.info p {
   font-size: 2rem;
-  flex-grow: 1;
+  font-weight: bold;
 }
 
-.cartItem p {
-  font-size: 2rem;
-}
-
-.cartItem button {
-  padding: 1rem 2rem;
-  font-size: 3rem;
-  background-color: var(--primary);
-  color: #111;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-}
-
-.cartItem button:hover {
-  background-color: var(--primary-dark);
-}
-
-.cartItem button:disabled {
-  background-color: var(--primary-light);
-  cursor: not-allowed;
-}
-
+/* QUANTIDADE */
 .quantityControls {
   display: flex;
   align-items: center;
@@ -69,16 +56,41 @@
   border-radius: 1rem;
 }
 
+.quantityControls button {
+  padding: 0.6rem 1.4rem;
+  font-size: 2.5rem;
+  background-color: var(--primary);
+  border: none;
+  cursor: pointer;
+}
+
 .quantityControls span {
   font-size: 2rem;
   margin: 0 2rem;
 }
 
+.quantityControls button:disabled {
+  background-color: var(--primary-light);
+  cursor: not-allowed;
+}
+
+/* REMOVER */
 .removeButton {
-  background-color: transparent;
+  background: none;
   border: none;
   cursor: pointer;
   color: var(--primary-dark);
-  font-size: 2.5rem;
-  margin-left: 2rem;
+}
+
+/* LIMPAR CARRINHO */
+.clearCart {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 2rem;
+  padding: 1rem 3rem;
+  background-color: transparent;
+  border: 0.3rem solid var(--primary-dark);
+  border-radius: 1rem;
+  cursor: pointer;
 }

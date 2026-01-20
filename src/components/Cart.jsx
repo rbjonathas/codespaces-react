@@ -10,48 +10,82 @@ export function Cart() {
   return (
     <div className={styles.cart}>
       <h2>Shopping Cart</h2>
+
       {cart.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
         <ul>
-          {cart.map((product, index) => (
-            <li key={product.id ?? index} className={styles.cartItem}>
-              <img src={product.thumbnail ?? ""} alt={product.title ?? "product"} />
-              <h3>{product.title ?? "Untitled"}</h3>
-              <p>${(Number(product.price) || 0).toFixed(2)}</p>
-              <div className={styles.quantityControls}>
-                <button
-                  disabled={product.quantity <= 1}
-                  onClick={() =>
-                    updateQtyCart(product.id, product.quantity - 1)
-                  }
-                >
-                  -
-                </button>
-                <span>{product.quantity}</span>
-                <button
-                  onClick={() =>
-                    updateQtyCart(product.id, product.quantity + 1)
-                  }
-                >
-                  +
-                </button>
-              </div>
-              <button
-                onClick={() => removeFromCart(product.id)}
-                className={styles.removeButton}
-              >
-                <Trash />
-              </button>
-            </li>
+          {cart.map((item) => (
+            <CartItem
+              key={item.variant_id}
+              item={item}
+              updateQtyCart={updateQtyCart}
+              removeFromCart={removeFromCart}
+            />
           ))}
         </ul>
       )}
+
       {cart.length > 0 && (
-        <button onClick={clearCart} className={styles.removeButton}>
-          CLEAR CART <Trash />
+        <button onClick={clearCart} className={styles.clearCart}>
+          CLEAR CART <Trash size={20} />
         </button>
       )}
     </div>
+  );
+}
+
+function CartItem({ item, updateQtyCart, removeFromCart }) {
+  return (
+    <li className={styles.cartItem}>
+      <img
+        src={item.image}
+        alt={item.title}
+      />
+
+      <div className={styles.info}>
+        <h3>{item.title}</h3>
+
+        {/* VARIANTS */}
+        <p className={styles.variant}>
+          Cor: <strong>{item.color}</strong> | Tamanho:{" "}
+          <strong>{item.size}</strong>
+        </p>
+
+        <p className={styles.price}>
+          ${(Number(item.price) || 0).toFixed(2)}
+        </p>
+      </div>
+
+      {/* QUANTIDADE */}
+      <div className={styles.quantityControls}>
+        <button
+          disabled={item.quantity <= 1}
+          onClick={() =>
+            updateQtyCart(item.variant_id, item.quantity - 1)
+          }
+        >
+          -
+        </button>
+
+        <span>{item.quantity}</span>
+
+        <button
+          onClick={() =>
+            updateQtyCart(item.variant_id, item.quantity + 1)
+          }
+        >
+          +
+        </button>
+      </div>
+
+      {/* REMOVER */}
+      <button
+        onClick={() => removeFromCart(item.variant_id)}
+        className={styles.removeButton}
+      >
+        <Trash size={22} />
+      </button>
+    </li>
   );
 }

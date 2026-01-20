@@ -1,0 +1,50 @@
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.form {
+  display: grid;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.form input,
+.form select {
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+}
+
+.form button {
+  padding: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid #eee;
+  padding: 0.8rem;
+  border-radius: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+.priceInfo {
+  font-size: 0.9rem;
+  color: #666;
+}

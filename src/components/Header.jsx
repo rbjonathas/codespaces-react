@@ -8,7 +8,7 @@ import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const { cart } = useContext(CartContext);
-  const { session } = useContext(SessionContext);
+  const { session, isAdmin } = useContext(SessionContext);
 
   return (
     <div className={styles.container}>
@@ -16,9 +16,10 @@ export function Header() {
         <Link to="/" className={styles.link}>
           <h1>TJA Megastore</h1>
         </Link>
+
         {session && (
           <Link to="/user" className={styles.welcomeMessage}>
-            Welcome, {session.user.user_metadata.username} {session.user.user_metadata.admin && '⭐'}
+            Welcome, {session.user.user_metadata.username} {isAdmin && "⭐"}
           </Link>
         )}
       </div>
@@ -34,27 +35,34 @@ export function Header() {
             </Link>
           </>
         )}
+
         <ThemeToggle />
+
         <Link to="/cart" className={styles.link}>
           <div className={styles.cartInfo}>
             <div className={styles.cartIcon}>
               <ShoppingBasket size={32} />
               {cart.length > 0 && (
                 <span className={styles.cartCount}>
-                  {cart.reduce((total, item) => total + (Number(item.quantity) || 0), 0)}
+                  {cart.reduce(
+                    (total, item) => total + (Number(item.quantity) || 0),
+                    0
+                  )}
                 </span>
               )}
             </div>
 
             <p>
-              Total: ${" "}
-              {(
-                cart.reduce(
+              Total: $
+              {cart
+                .reduce(
                   (total, product) =>
-                    total + (Number(product.price) || 0) * (Number(product.quantity) || 0),
+                    total +
+                    (Number(product.price) || 0) *
+                      (Number(product.quantity) || 0),
                   0
                 )
-              ).toFixed(2)}
+                .toFixed(2)}
             </p>
           </div>
         </Link>

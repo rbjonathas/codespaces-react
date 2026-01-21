@@ -14,12 +14,12 @@ export function Header() {
     <div className={styles.container}>
       <div>
         <Link to="/" className={styles.link}>
-          <h1>TJA Megastore</h1>
+          <h1>Black Coffee</h1>
         </Link>
 
         {session && (
           <Link to="/user" className={styles.welcomeMessage}>
-            Welcome, {session.user.user_metadata.username} {isAdmin && "⭐"}
+            Welcome, {session.user.user_metadata.username} {isAdmin && "- Manager ⭐"}
           </Link>
         )}
       </div>

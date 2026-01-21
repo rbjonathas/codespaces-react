@@ -1,0 +1,20 @@
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+input {
+  flex: 1;
+  padding: 1rem;
+}
+
+button {
+  padding: 1rem 2rem;
+  cursor: pointer;
+}

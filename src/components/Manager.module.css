@@ -1,56 +1,346 @@
 .container {
-  width: 100%;
-  padding: 1.5rem 1rem 4rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
 }
 
-/* 🔍 BUSCA */
-.searchContainer {
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.header p {
+  font-size: 1.1rem;
+  color: var(--gray-600);
+}
+
+/* 🔖 ABAS */
+.tabs {
   display: flex;
   gap: 1rem;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--gray-300);
+}
+
+.tabButton {
+  padding: 1rem 2rem;
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--gray-600);
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tabButton:hover {
+  color: var(--text);
+}
+
+.tabButton.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* 📝 FORMULÁRIO */
+.formSection {
+  background: var(--primary-light);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  border: 2px solid var(--primary);
+}
+
+.formSection h2 {
+  margin-bottom: 1.5rem;
+  color: var(--text);
+  font-size: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.2);
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.submitBtn,
+.cancelBtn {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submitBtn {
+  background: var(--primary);
+  color: white;
+  flex: 1;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 111, 71, 0.2);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: var(--primary-light);
+  color: var(--text);
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: var(--gray-300);
+}
+
+/* 📋 LISTA DE PRODUTOS */
+.listSection {
+  background: var(--background);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid var(--gray-300);
+}
+
+.listSection h2 {
+  margin-bottom: 1.5rem;
+  color: var(--text);
+  font-size: 1.5rem;
 }
 
 .searchInput {
-  flex: 1;
-  padding: 1rem;
-  font-size: 1.1rem;
-  border-radius: 12px;
-  border: 2px solid #2b2b2b;
-  outline: none;
-}
-
-.searchButton {
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  border-radius: 12px;
-  border: none;
-  background: #111;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* 🧱 GRID DE PRODUTOS */
-.productList {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-
-  display: grid;
-  gap: 1.8rem;
-
-  /* Mobile / Tablet */
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  background-color: var(--gray-100);
+  color: var(--text);
 }
 
-/* Desktop */
-@media (min-width: 1024px) {
-  .productList {
-    grid-template-columns: repeat(3, 1fr);
+.searchInput::placeholder {
+  color: var(--gray-600);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.2);
+}
+
+.emptyMessage {
+  text-align: center;
+  padding: 2rem;
+  color: var(--gray-600);
+  font-size: 1.1rem;
+}
+
+/* 📊 TABELA */
+.productTable {
+  overflow-x: auto;
+}
+
+.productTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.productTable thead {
+  background: var(--primary-light);
+  border-bottom: 2px solid var(--primary);
+}
+
+.productTable th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.productTable td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--gray-300);
+}
+
+.productTable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.productTable tbody tr:hover {
+  background: var(--primary-light);
+}
+
+.productName {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.description {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+}
+
+.price {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.optionsCount {
+  text-align: center;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.imageCol {
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editBtn,
+.deleteBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.editBtn {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border: 2px solid var(--primary);
+}
+
+.editBtn:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+.deleteBtn {
+  background: #d9534f;
+  color: white;
+}
+
+.deleteBtn:hover:not(:disabled) {
+  background: #ac2925;
+}
+
+.editBtn:disabled,
+.deleteBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsivo para tabela em mobile */
+@media (max-width: 768px) {
+  .tabs {
+    gap: 0.5rem;
+  }
+
+  .tabButton {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .productTable {
+    font-size: 0.9rem;
+  }
+
+  .productTable th,
+  .productTable td {
+    padding: 0.75rem;
+  }
+
+  .editBtn,
+  .deleteBtn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
   }
 }

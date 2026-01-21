@@ -9,6 +9,7 @@ export function ProductList() {
   const { products, loading, error } = useContext(CartContext);
 
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [expandedProductId, setExpandedProductId] = useState(null);
 
   const searchInput = useRef(null);
 
@@ -20,12 +21,16 @@ export function ProductList() {
 
   function handleSearch() {
     const query = searchInput.current.value.toLowerCase();
-    setFilteredProducts(
-      products.filter((product) =>
-        product.title.toLowerCase().includes(query) || 
-        product.description.toLowerCase().includes(query)
-      )
-    );
+    if (query.trim() === "") {
+      setFilteredProducts(products);
+    } else {
+      setFilteredProducts(
+        products.filter((product) =>
+          (product.name && product.name.toLowerCase().includes(query)) || 
+          (product.description && product.description.toLowerCase().includes(query))
+        )
+      );
+    }
   }
 
   function handleClear() {
@@ -42,14 +47,24 @@ export function ProductList() {
           placeholder="Search products..."
           className={styles.searchInput}
           onChange={handleSearch}
+          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
         />
-        <button className={styles.searchButton} onClick={handleClear}>
+        <button className={styles.searchButton} onClick={handleSearch}>
+          OK
+        </button>
+        <button className={styles.clearButton} onClick={handleClear}>
           CLEAR
         </button>
       </div>
       <div className={styles.productList}>
         {filteredProducts.map((product) => (
-          <Product key={product.id} product={product} />
+          <Product 
+            key={product.id} 
+            product={product}
+            isExpanded={expandedProductId === product.id}
+            onExpand={() => setExpandedProductId(product.id)}
+            onClose={() => setExpandedProductId(null)}
+          />
         ))}
       </div>
       {loading && (

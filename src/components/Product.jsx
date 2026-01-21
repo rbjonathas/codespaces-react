@@ -3,20 +3,19 @@ import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import { supabase } from "../utils/supabase";
 
-export function Product({ product }) {
+export function Product({ product, isExpanded, onExpand, onClose }) {
   const { addToCart } = useContext(CartContext);
 
   const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [showOptions, setShowOptions] = useState(false);
   const [added, setAdded] = useState(false);
 
-  /* 🔹 CARREGA OPÇÕES (VARIANTES) */
+  /* 🔹 CARREGA OPÇÕES */
   useEffect(() => {
     async function loadOptions() {
       const { data, error } = await supabase
         .from("product_options")
-        .select("id, option_name, price")
+        .select("id, option_name, price, image_url")
         .eq("product_id", product.id)
         .order("price");
 
@@ -27,73 +26,107 @@ export function Product({ product }) {
     loadOptions();
   }, [product.id]);
 
+  /* 🔹 IMAGEM ATUAL */
+  const currentImage =
+    selectedOption?.image_url || product.image_url;
+
+  /* 🔹 ADICIONAR E RESETAR */
+  function handleAddToCart() {
+    if (!selectedOption) return;
+
+    addToCart({ id: selectedOption.id });
+
+    setAdded(true);
+    setTimeout(() => {
+      handleClose();
+    }, 1200);
+  }
+
+  /* 🔹 FECHAR E RESETAR */
+  function handleClose() {
+    setSelectedOption(null);
+    setAdded(false);
+    onClose();
+  }
+
+  /* 🔹 TOGGLE SELEÇÃO */
+  function handleToggleOption(option) {
+    if (selectedOption?.id === option.id) {
+      setSelectedOption(null);
+    } else {
+      setSelectedOption(option);
+    }
+  }
+
   return (
-    <div className={styles.productCard}>
-      <img
-        src={product.image_url}
-        alt={product.name}
-        className={styles.productImage}
-      />
+    <>
+      {/* OVERLAY quando expandido */}
+      {isExpanded && (
+        <div 
+          className={styles.overlay}
+          onClick={handleClose}
+        />
+      )}
 
-      <h2 className={styles.productTitle}>{product.name}</h2>
+      <div className={`${styles.productCard} ${isExpanded ? styles.expanded : ""}`}>
+        <img
+          src={currentImage}
+          alt={product.name}
+          className={styles.productImage}
+        />
 
-      {product.description && (
-        <p className={styles.productDescription}>
-          {product.description}
+        <h2 className={styles.productTitle}>{product.name}</h2>
+
+        {product.description && (
+          <p className={styles.productDescription}>
+            {product.description}
+          </p>
+        )}
+
+        <p className={styles.productPrice}>
+          {selectedOption
+            ? `R$ ${Number(selectedOption.price).toFixed(2)}`
+            : isExpanded && "Selecione uma opção"}
         </p>
-      )}
 
-      {/* 🔹 PREÇO */}
-      <p className={styles.productPrice}>
-        {selectedOption
-          ? `R$ ${Number(selectedOption.price).toFixed(2)}`
-          : "Selecione uma opção"}
-      </p>
+        {isExpanded && (
+          <div className={styles.optionsBox}>
+            {options.map((option) => (
+              <button
+                key={option.id}
+                className={`${styles.optionButton} ${
+                  selectedOption?.id === option.id ? styles.active : ""
+                }`}
+                onClick={() => handleToggleOption(option)}
+              >
+                <strong>{option.option_name}</strong>
+                <span>R$ {Number(option.price).toFixed(2)}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
-      {/* 🔹 OPÇÕES */}
-      {showOptions && (
-        <div className={styles.optionsBox}>
-          {options.map((option) => (
-            <button
-              key={option.id}
-              className={`${styles.optionButton} ${
-                selectedOption?.id === option.id ? styles.active : ""
-              }`}
-              onClick={() => setSelectedOption(option)}
-            >
-              <strong>{option.option_name}</strong>
-              <span>R$ {Number(option.price).toFixed(2)}</span>
-            </button>
-          ))}
-        </div>
-      )}
+        <button
+          className={styles.productButton}
+          disabled={isExpanded && !selectedOption}
+          onClick={() => {
+            if (!isExpanded) {
+              onExpand();
+              return;
+            }
 
-      {/* 🔹 BOTÃO PRINCIPAL */}
-      <button
-        className={styles.productButton}
-        disabled={showOptions && !selectedOption}
-        onClick={() => {
-          if (!showOptions) {
-            setShowOptions(true);
-            return;
-          }
+            if (!selectedOption) return;
 
-          if (!selectedOption) return;
-
-          addToCart({
-            id: selectedOption.id, // product_option_id
-          });
-
-          setAdded(true);
-          setTimeout(() => setAdded(false), 1200);
-        }}
-      >
-        {!showOptions
-          ? "ESCOLHER"
-          : added
-          ? "✔ ADICIONADO"
-          : "ADICIONAR"}
-      </button>
-    </div>
+            handleAddToCart();
+          }}
+        >
+          {!isExpanded
+            ? "ESCOLHER"
+            : added
+            ? "✔ ADICIONADO"
+            : "ADICIONAR"}
+        </button>
+      </div>
+    </>
   );
 }

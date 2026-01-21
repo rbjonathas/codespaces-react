@@ -17,7 +17,7 @@ export function Cart() {
         <ul>
           {cart.map((item) => (
             <CartItem
-              key={item.variant_id}
+              key={item.option_id}
               item={item}
               updateQtyCart={updateQtyCart}
               removeFromCart={removeFromCart}
@@ -38,22 +38,19 @@ export function Cart() {
 function CartItem({ item, updateQtyCart, removeFromCart }) {
   return (
     <li className={styles.cartItem}>
-      <img
-        src={item.image}
-        alt={item.title}
-      />
+      {item.image && (
+        <img
+          src={item.image}
+          alt={item.name}
+        />
+      )}
 
       <div className={styles.info}>
-        <h3>{item.title}</h3>
-
-        {/* VARIANTS */}
-        <p className={styles.variant}>
-          Cor: <strong>{item.color}</strong> | Tamanho:{" "}
-          <strong>{item.size}</strong>
-        </p>
+        <h3>{item.name}</h3>
+        <p className={styles.option}>{item.option_name}</p>
 
         <p className={styles.price}>
-          ${(Number(item.price) || 0).toFixed(2)}
+          R$ {(Number(item.price) || 0).toFixed(2)}
         </p>
       </div>
 
@@ -62,7 +59,7 @@ function CartItem({ item, updateQtyCart, removeFromCart }) {
         <button
           disabled={item.quantity <= 1}
           onClick={() =>
-            updateQtyCart(item.variant_id, item.quantity - 1)
+            updateQtyCart(item.option_id, item.quantity - 1)
           }
         >
           -
@@ -72,7 +69,7 @@ function CartItem({ item, updateQtyCart, removeFromCart }) {
 
         <button
           onClick={() =>
-            updateQtyCart(item.variant_id, item.quantity + 1)
+            updateQtyCart(item.option_id, item.quantity + 1)
           }
         >
           +
@@ -81,7 +78,7 @@ function CartItem({ item, updateQtyCart, removeFromCart }) {
 
       {/* REMOVER */}
       <button
-        onClick={() => removeFromCart(item.variant_id)}
+        onClick={() => removeFromCart(item.option_id)}
         className={styles.removeButton}
       >
         <Trash size={22} />

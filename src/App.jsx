@@ -18,6 +18,9 @@ import { AdminRoute } from "./components/admin/AdminRoute";
 
 import Manager from "./components/Manager";
 import { ManagerVariants } from "./components/ManagerVariants";
+import AdminCategories from "./components/admin/AdminCategories";
+import AdminOptions from "./components/admin/AdminOptions";
+import AdminProducts from "./components/admin/AdminProducts";
 
 export default function App() {
   return (
@@ -64,6 +67,33 @@ export default function App() {
               element={
                 <AdminRoute>
                   <ManagerVariants />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/categories"
+              element={
+                <AdminRoute>
+                  <AdminCategories />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/options"
+              element={
+                <AdminRoute>
+                  <AdminOptions />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/products"
+              element={
+                <AdminRoute>
+                  <AdminProducts />
                 </AdminRoute>
               }
             />

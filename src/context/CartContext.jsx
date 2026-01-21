@@ -48,9 +48,11 @@ export function CartProvider({ children }) {
           id,
           option_name,
           price,
+          image_url,
           product:products (
             id,
-            name
+            name,
+            image_url
           )
         )
       `)
@@ -69,6 +71,7 @@ export function CartProvider({ children }) {
         name: row.product_option.product.name,
         option_name: row.product_option.option_name,
         price: row.product_option.price,
+        image: row.product_option.image_url || row.product_option.product.image_url,
       }))
     );
   };
@@ -139,6 +142,9 @@ export function CartProvider({ children }) {
           user_id: session.user.id,
           product_option_id: option_id,
         });
+
+      // Remove do estado local mantendo a ordem
+      setCart(cart.filter(item => item.option_id !== option_id));
     } else {
       await supabase
         .from("cart")
@@ -147,9 +153,14 @@ export function CartProvider({ children }) {
           user_id: session.user.id,
           product_option_id: option_id,
         });
-    }
 
-    await loadCartForUser(session.user.id);
+      // Atualiza apenas no estado local mantendo a ordem
+      setCart(cart.map(item => 
+        item.option_id === option_id 
+          ? { ...item, quantity }
+          : item
+      ));
+    }
   };
 
   /* REMOVE ITEM */
